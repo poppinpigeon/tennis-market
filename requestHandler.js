@@ -45,10 +45,22 @@ function blackRacket(response){
     })
 }
 
+function order(response, productId){
+    response.writeHead(200, {'Content-Type': 'text/html'});
+    //productId is passed correctly but query does not work
+    console.log(typeof(productId));
+    mysqldb.query("INSERT INTO orderlist VALUES ('"+productId+"', '"+new Date().toLocaleDateString()+"');", function(err, rows){
+        console.log(rows);
+    })
+
+    response.write('order page');
+    response.end();
+}
 
 let handle = {}; //key value pair
 handle['/'] = main;
 handle['/favicon.ico'] = favIcon;
+handle['/order'] = order;
 
 /*image directory*/
 handle['/img/redRacket.png'] = redRacket;
