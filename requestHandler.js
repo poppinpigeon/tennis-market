@@ -1,6 +1,7 @@
 const mysqldb = require('./database/connect/mysql');
 const fs = require('fs');
 const main_view = fs.readFileSync('./main.html', 'utf-8');
+const orderlist_view = fs.readFileSync('./orderlist.html', 'utf-8');
 
 function main(response){
     console.log('main');
@@ -47,8 +48,6 @@ function blackRacket(response){
 
 function order(response, productId){
     response.writeHead(200, {'Content-Type': 'text/html'});
-    //productId is passed correctly but query does not work
-    console.log(typeof(productId));
     mysqldb.query("INSERT INTO orderlist VALUES ('"+productId+"', '"+new Date().toLocaleDateString()+"');", function(err, rows){
         console.log(rows);
     })
@@ -57,10 +56,29 @@ function order(response, productId){
     response.end();
 }
 
+function orderlist(response){
+    console.log('orderlist');
+    response.writeHead(200, {'Content-Type': 'text/html'});
+    mysqldb.query("SELECT * FROM orderlist", function(err, rows){
+        response.write(orderlist_view);
+
+        rows.forEach(element => {
+            response.write("<tr>"
+                        + "<td>" + element.productId + "</td>"
+                        + "<td>" + element.date + "</td>"
+                        + "</tr>");
+        });
+        
+        response.write("</table>");
+        response.end();
+    })
+}
+
 let handle = {}; //key value pair
 handle['/'] = main;
 handle['/favicon.ico'] = favIcon;
 handle['/order'] = order;
+handle['/orderlist'] = orderlist;
 
 /*image directory*/
 handle['/img/redRacket.png'] = redRacket;
